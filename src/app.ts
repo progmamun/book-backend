@@ -4,48 +4,64 @@ import httpStatus from 'http-status';
 import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-// import { rateLimit } from 'express-rate-limit';
+import { RateLimitRequestHandler, rateLimit } from 'express-rate-limit';
 import compression from 'compression';
 
 import globalErrorHandler from './app/middleware/globalErrorHandler';
+import hpp from 'hpp';
 // import routes from './app/routes';
 
 const app: Application = express();
 
 app.enable('trust proxy');
 
+// 1) GLOBAL MIDDLEWARE
 app.use(cors());
+app.options('*', cors());
 
 // Set security HTTP headers
 app.use(helmet());
 
 // Limit requests from same API
-// const limiter = rateLimit({
-//   max: 100,
-//   windowMs: 60 * 60 * 1000,
-//   message: 'Too many requests from this IP, please try again in an hour!',
-// });
+const limiter: RateLimitRequestHandler = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+});
+app.use('/api', limiter);
 
 //parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
+// Prevent parameter pollution
+/* app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  }),
+); */
+app.use(hpp());
+
 app.use(compression());
 
 // routes
-// app.use('/api/v1', routes, limiter);
+// app.use('/api/v1', routes);
 
 // root route
 app.get('/', (req: Request, res: Response) => {
-  res.send('RUB Book server is running..');
+  res.send('RUB Book Server is running..');
 });
-
-//global error handler
-app.use(globalErrorHandler);
 
 //handle not found
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -61,5 +77,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   });
   next();
 });
+
+//global error handler
+app.use(globalErrorHandler);
 
 export default app;
