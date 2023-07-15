@@ -9,7 +9,7 @@ import compression from 'compression';
 
 import globalErrorHandler from './app/middleware/globalErrorHandler';
 import hpp from 'hpp';
-// import routes from './app/routes';
+import routes from './app/routes';
 
 const app: Application = express();
 
@@ -56,7 +56,7 @@ app.use(hpp());
 app.use(compression());
 
 // routes
-// app.use('/api/v1', routes);
+app.use('/api/v1', routes);
 
 // root route
 app.get('/', (req: Request, res: Response) => {
