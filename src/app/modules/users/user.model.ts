@@ -1,77 +1,71 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
-import config from '../../../config';
 import { IUser, UserModel } from './user.interface';
+import config from '../../../config';
 
-const UserSchema = new Schema<IUser, UserModel>(
+const UserSchema = new Schema<IUser>(
   {
-    email: {
+    name: {
+      type: {
+        firstName: {
+          type: String,
+          required: true,
+        },
+        lastName: {
+          type: String,
+          required: true,
+        },
+      },
+      required: true,
+    },
+    password: {
       type: String,
       required: true,
-      unique: true,
     },
     role: {
       type: String,
       enum: ['user', 'author', 'admin'],
       default: 'user',
     },
-    password: {
+    email: {
       type: String,
+      unique: true,
       required: true,
-      select: false,
-    },
-    needsPasswordChange: {
-      type: Boolean,
-      default: true,
-    },
-    passwordChangedAt: {
-      type: Date,
     },
   },
   {
     timestamps: true,
     toJSON: {
       virtuals: true,
+      transform: function (doc, ret) {
+        delete ret['password'];
+        return ret;
+      },
     },
-  },
+  }
 );
 
 UserSchema.statics.isUserExist = async function (
-  id: string,
+  email: string
 ): Promise<IUser | null> {
-  return await User.findOne(
-    { id },
-    { id: 1, password: 1, role: 1, needsPasswordChange: 1 },
-  );
+  return await User.findOne({ email }, { email: 1, password: 1, role: 1 });
 };
 
 UserSchema.statics.isPasswordMatched = async function (
   givenPassword: string,
-  savedPassword: string,
+  savedPassword: string
 ): Promise<boolean> {
   return await bcrypt.compare(givenPassword, savedPassword);
 };
 
-UserSchema.methods.changedPasswordAfterJwtIssued = function (
-  jwtTimestamp: number,
-) {
-  console.log({ jwtTimestamp }, 'hi');
-};
-
-// User.create() / user.save()
 UserSchema.pre('save', async function (next) {
   // hashing user password
   const user = this;
   user.password = await bcrypt.hash(
     user.password,
-    Number(config.bcrypt_salt_rounds),
+    Number(config.bcrypt_salt_rounds)
   );
-
-  if (!user.needsPasswordChange) {
-    user.passwordChangedAt = new Date();
-  }
-
   next();
 });
 
