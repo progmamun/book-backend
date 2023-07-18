@@ -28,6 +28,9 @@ const BookSchema = new Schema<IBook>(
       type: String,
       required: true,
     },
+    email: {
+      type: String,
+    },
     user: {
       type: Types.ObjectId,
       ref: 'User',

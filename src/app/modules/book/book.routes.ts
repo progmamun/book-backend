@@ -7,18 +7,20 @@ const router = express.Router();
 
 router.post('/create-book', BookController.createBook);
 
+router.get('/new-books/', BookController.getTopBooks);
+
 router.get('/:slug', BookController.getSingleBook);
 
 router.get('/', BookController.getAllBooks);
 
 router.patch(
-  '/:id',
+  '/:slug',
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.AUTHOR),
   BookController.updateBook
 );
 
 router.delete(
-  '/:id',
+  '/:slug',
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.AUTHOR),
   BookController.deleteBook
 );

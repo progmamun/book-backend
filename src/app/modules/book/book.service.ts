@@ -77,10 +77,10 @@ const getAllBooks = async (
 };
 
 const updateBook = async (
-  id: string,
+  slug: string,
   payload: Partial<IBook>
 ): Promise<IBook | null> => {
-  const isExist = await Book.findOne({ id });
+  const isExist = await Book.findOne({ slug });
 
   if (!isExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Book not found !');
@@ -96,15 +96,15 @@ const updateBook = async (
     });
   }
 
-  const result = await Book.findOneAndUpdate({ id }, updatedBookData, {
+  const result = await Book.findOneAndUpdate({ slug }, updatedBookData, {
     new: true,
   });
   return result;
 };
 
-const deleteBook = async (id: string): Promise<IBook | null> => {
+const deleteBook = async (slug: string): Promise<IBook | null> => {
   // check if the Book is exist
-  const isExist = await Book.findOne({ id });
+  const isExist = await Book.findOne({ slug });
 
   if (!isExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Book not found !');
@@ -115,12 +115,12 @@ const deleteBook = async (id: string): Promise<IBook | null> => {
   try {
     session.startTransaction();
     //delete Book first
-    const book = await Book.findOneAndDelete({ id }, { session });
+    const book = await Book.findOneAndDelete({ slug }, { session });
     if (!book) {
       throw new ApiError(404, 'Failed to delete book');
     }
     //delete user
-    await User.deleteOne({ id });
+    await User.deleteOne({ slug });
     session.commitTransaction();
     session.endSession();
 
