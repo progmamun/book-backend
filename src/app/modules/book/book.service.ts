@@ -6,6 +6,7 @@ import { Book } from './book.model';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
 import { User } from '../users/user.model';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createBook = async (payload: IBook) => {
   const result = await Book.create(payload);
@@ -78,28 +79,33 @@ const getAllBooks = async (
 
 const updateBook = async (
   slug: string,
-  payload: Partial<IBook>
-): Promise<IBook | null> => {
+  payload: Partial<IBook>,
+  user: JwtPayload | null
+) => {
   const isExist = await Book.findOne({ slug });
 
   if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Book not found !');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Book Not Found');
   }
-
-  const { title, ...BookData } = payload;
-  const updatedBookData: Partial<IBook> = { ...BookData };
-
-  if (title && Object.keys(title).length > 0) {
-    Object.keys(title).forEach(key => {
-      const titleKey = `title.${key}` as keyof Partial<IBook>;
-      (updatedBookData as any)[titleKey] = title[key as keyof typeof title];
-    });
+  // console.log(isExist.id, user?.slug);
+  if (isExist.id !== user?.userEmail) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
   }
-
-  const result = await Book.findOneAndUpdate({ slug }, updatedBookData, {
-    new: true,
-  });
-  return result;
+  try {
+    const result = await Book.findOneAndUpdate(
+      { slug },
+      { $set: payload },
+      {
+        new: true,
+      }
+    );
+    if (!result) {
+      return new ApiError(httpStatus.NOT_FOUND, 'Book Not Found');
+    }
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const deleteBook = async (slug: string): Promise<IBook | null> => {
@@ -131,10 +137,33 @@ const deleteBook = async (slug: string): Promise<IBook | null> => {
   }
 };
 
+const review = async (slug: string, payload: any) => {
+  const isExist = await Book.findOne({ slug });
+  if (!isExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Book Not Found');
+  }
+  try {
+    const result = await Book.updateOne(
+      { slug },
+      { $push: { reveiws: payload } }
+    );
+    if (!result.modifiedCount) {
+      return new ApiError(
+        httpStatus.NOT_FOUND,
+        'Book Not Found or post review failed'
+      );
+    }
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const BookService = {
   createBook,
   getSingleBook,
   getAllBooks,
   updateBook,
   deleteBook,
+  review,
 };

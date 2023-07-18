@@ -15,4 +15,6 @@ router.patch('/:slug', BookController.updateBook);
 
 router.delete('/:slug', BookController.deleteBook);
 
+router.post('/review/:slug', BookController.review);
+
 export const BookRoutes = router;

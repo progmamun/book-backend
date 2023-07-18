@@ -57,13 +57,14 @@ const getAllBooks = catchAsync(async (req: Request, res: Response) => {
 
 const updateBook = catchAsync(async (req: Request, res: Response) => {
   const slug = req.params.slug;
-  const updatedData = req.body;
-  const result = await BookService.updateBook(slug, updatedData);
+  const payload = req.body;
+  const user = req.user;
+  const result = await updateBook(slug, payload, user);
 
-  sendResponse<IBook>(res, {
-    statusCode: httpStatus.OK,
+  res.send({
     success: true,
-    message: 'Book updated successfully !',
+    statusCode: 200,
+    message: 'Book Updated Successfully',
     data: result,
   });
 });
@@ -80,6 +81,19 @@ const deleteBook = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const review = catchAsync(async (req: Request, res: Response) => {
+  const slug = req.params.slug;
+  const payload = req.body;
+  const result = await BookService.review(slug, payload);
+
+  res.send({
+    success: true,
+    statusCode: 200,
+    message: 'review posted',
+    data: result,
+  });
+});
+
 export const BookController = {
   createBook,
   getTopBooks,
@@ -87,4 +101,5 @@ export const BookController = {
   getAllBooks,
   updateBook,
   deleteBook,
+  review,
 };
