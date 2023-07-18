@@ -1,16 +1,16 @@
 /* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
-export type UserName = {
-  firstName: string;
-  lastName: string;
-};
+// export type UserName = {
+//   firstName: string;
+//   lastName: string;
+// };
 
 export type IUser = {
-  name: UserName;
+  // name: UserName;
+  email: string;
   password: string;
   role: string;
-  email: string;
 };
 export type UserModel = {
   isUserExist(

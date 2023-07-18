@@ -14,6 +14,7 @@
 - yarn husky install
 - yarn add -D lint-staged
 - yarn add zod
+- yarn add slugify
 
 ---
 

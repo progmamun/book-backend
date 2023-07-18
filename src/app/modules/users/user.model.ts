@@ -6,17 +6,9 @@ import config from '../../../config';
 
 const UserSchema = new Schema<IUser>(
   {
-    name: {
-      type: {
-        firstName: {
-          type: String,
-          required: true,
-        },
-        lastName: {
-          type: String,
-          required: true,
-        },
-      },
+    email: {
+      type: String,
+      unique: true,
       required: true,
     },
     password: {
@@ -27,11 +19,6 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ['user', 'author', 'admin'],
       default: 'user',
-    },
-    email: {
-      type: String,
-      unique: true,
-      required: true,
     },
   },
   {
