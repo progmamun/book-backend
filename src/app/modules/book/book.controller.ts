@@ -20,8 +20,8 @@ const createBook = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getSingleBook = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const result = await BookService.getSingleBook(id);
+  const slug = req.params.slug;
+  const result = await BookService.getSingleBook(slug);
 
   sendResponse<IBook>(res, {
     statusCode: httpStatus.OK,
