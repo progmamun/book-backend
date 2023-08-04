@@ -7,14 +7,14 @@ router.post('/create-book', BookController.createBook);
 
 router.get('/new-books/', BookController.getTopBooks);
 
-router.get('/:slug', BookController.getSingleBook);
+router.get('/:id', BookController.getSingleBook);
 
 router.get('/', BookController.getAllBooks);
 
-router.patch('/:slug', BookController.updateBook);
+router.delete('/:id', BookController.deleteBook);
 
-router.delete('/:slug', BookController.deleteBook);
+router.patch('/:id', BookController.updateBook);
 
-router.post('/review/:slug', BookController.review);
+router.patch('/review/:id', BookController.review);
 
 export const BookRoutes = router;

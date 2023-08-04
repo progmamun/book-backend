@@ -26,10 +26,16 @@ const BookSchema = new Schema<IBook>(
     },
     publicationDate: {
       type: String,
+    },
+    publicationYear: {
+      type: String,
       required: true,
     },
     email: {
       type: String,
+    },
+    reviews: {
+      type: [String],
     },
     user: {
       type: Types.ObjectId,

@@ -31,8 +31,8 @@ const getTopBooks = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getSingleBook = catchAsync(async (req: Request, res: Response) => {
-  const slug = req.params.slug;
-  const result = await BookService.getSingleBook(slug);
+  const { id } = req.params;
+  const result = await BookService.getSingleBook(id);
 
   sendResponse<IBook>(res, {
     statusCode: httpStatus.OK,
@@ -56,10 +56,9 @@ const getAllBooks = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateBook = catchAsync(async (req: Request, res: Response) => {
-  const slug = req.params.slug;
-  const payload = req.body;
-  const user = req.user;
-  const result = await updateBook(slug, payload, user);
+  const { id } = req.params;
+  const updatedData = req.body;
+  const result = await BookService.updateBook(id, updatedData);
 
   res.send({
     success: true,
@@ -70,21 +69,21 @@ const updateBook = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteBook = catchAsync(async (req: Request, res: Response) => {
-  const slug = req.params.slug;
-  const result = await BookService.deleteBook(slug);
+  const { id } = req.params;
+  const result = await BookService.deleteBook(id);
 
   sendResponse<IBook>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Book deleted successfully !',
+    message: 'Book deleted successfully!',
     data: result,
   });
 });
 
 const review = catchAsync(async (req: Request, res: Response) => {
-  const slug = req.params.slug;
-  const payload = req.body;
-  const result = await BookService.review(slug, payload);
+  const { id } = req.params;
+  const updatedData = req.body;
+  const result = await BookService.review(id, updatedData);
 
   res.send({
     success: true,

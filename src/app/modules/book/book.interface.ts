@@ -8,7 +8,9 @@ export type IBook = {
   genre: string;
   img: string;
   publicationDate: string;
+  publicationYear: string;
   email: string;
+  reviews?: string[];
   user?: Types.ObjectId | IUser;
 };
 
@@ -16,8 +18,4 @@ export type BookModel = Model<IBook, Record<string, unknown>>;
 
 export type IBookFilters = {
   searchTerm?: string;
-  title?: string;
-  author?: string;
-  genre?: string;
-  publicationDate?: string;
 };
